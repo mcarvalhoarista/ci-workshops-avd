@@ -1,0 +1,120 @@
+hostname: s1-leaf4
+is_deployed: true
+static_routes:
+- vrf: default
+  destination_address_prefix: 0.0.0.0/0
+  gateway: 192.168.0.1
+service_routing_protocols_model: multi-agent
+vlan_internal_order:
+  allocation: ascending
+  range:
+    beginning: 1006
+    ending: 1199
+spanning_tree:
+  mode: mstp
+  mst_instances:
+  - id: '0'
+    priority: 16384
+  no_spanning_tree_vlan: '4094'
+local_users:
+- name: arista
+  privilege: 15
+  role: network-admin
+  sha512_password: $6$rounds=656000$arista$SbB9Tqs6dTQk4gC4s4gFPowAhdCsjrFr9nc7uNhQ3XWqVxES2/JegRe0E67TcSjBZrJW312zqzIXrGHCKVGTd/
+  ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDWTKo0FfK2b9O54YY9V8IYeL7CYoRo/8uj16J6EZKg9UvIByITKe8DR68MNDC+JxjFnFCaS1QG9ikAskyl/2HAEoZHKHPCRKOrfwC4YoeleM352fo2aCJftfWgJbLpgqFb+YYNxc9Fip6boVfImFMhvVD9Kbw03eaUEfhAdOimgLzD08f2eRMf9HrqLwojLm6ju9qIrkgx/6xiey9eDJ2o0nBjyG7CHUW27IHHbLEFfRihBJNP+HjcDQGYsDOb1fAuklsoVqVk6CVRXzI8pI8gcGhIxCuFYxZjWnGj+62UueTxwu3TpEBRiBqdHqIytX5m43nLw6c2xrwolQW4R0/ypp8tBeibjGCnKDf0b3yL8WowUV9Gql/XEAoxGb8MNdEM8lS7gcPDPvCzDodtlNkM3brE8I87JGx7rbKMRpPX54Rh7FJD0/bjZaxYQ31RUePgYgZjiuEGF/l17AagBNdOnZKzz/0CeaMSdb6ej1nXhqjaX3LPHkYpdJfl6VXDQ78=
+    mcarvalho@Marcelos-MacBook-Pro.local
+vrfs:
+- name: default
+  ip_routing: false
+management_interfaces:
+- name: Management0
+  description: oob_management
+  shutdown: false
+  vrf: default
+  ip_address: 192.168.0.15/24
+  gateway: 192.168.0.1
+  type: oob
+management_api_http:
+  enable_vrfs:
+  - name: default
+  enable_https: true
+vlans:
+- id: 4094
+  tenant: system
+  name: MLAG_PEER
+  trunk_groups:
+  - MLAG
+vlan_interfaces:
+- name: Vlan4094
+  description: MLAG_PEER
+  shutdown: false
+  no_autostate: true
+  mtu: 1500
+  ip_address: 10.1.253.1/31
+port_channel_interfaces:
+- name: Port-Channel1
+  description: MLAG_PEER_s1-leaf3_Po1
+  type: switched
+  shutdown: false
+  mode: trunk
+  trunk_groups:
+  - MLAG
+- name: Port-Channel2
+  description: SPINES_Po4
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: none
+  mlag: 2
+ethernet_interfaces:
+- name: Ethernet1
+  peer: s1-leaf3
+  peer_interface: Ethernet1
+  peer_type: mlag_peer
+  description: MLAG_PEER_s1-leaf3_Ethernet1
+  type: port-channel-member
+  shutdown: false
+  channel_group:
+    id: 1
+    mode: active
+- name: Ethernet6
+  peer: s1-leaf3
+  peer_interface: Ethernet6
+  peer_type: mlag_peer
+  description: MLAG_PEER_s1-leaf3_Ethernet6
+  type: port-channel-member
+  shutdown: false
+  channel_group:
+    id: 1
+    mode: active
+- name: Ethernet2
+  peer: s1-spine1
+  peer_interface: Ethernet5
+  peer_type: l3spine
+  description: S1-SPINE1_Ethernet5
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 2
+    mode: active
+- name: Ethernet3
+  peer: s1-spine2
+  peer_interface: Ethernet5
+  peer_type: l3spine
+  description: S1-SPINE2_Ethernet5
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 2
+    mode: active
+mlag_configuration:
+  domain_id: RACK2
+  local_interface: Vlan4094
+  peer_address: 10.1.253.0
+  peer_link: Port-Channel1
+  reload_delay_mlag: '300'
+  reload_delay_non_mlag: '330'
+ip_igmp_snooping:
+  globally_enabled: true
+metadata:
+  platform: cEOS
